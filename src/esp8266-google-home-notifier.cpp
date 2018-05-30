@@ -9,10 +9,11 @@ boolean GoogleHomeNotifier::device(const char * name)
 
 boolean GoogleHomeNotifier::device(const char * name, const char * locale)
 {
-  int timeout = millis() + 5000;
+  int timeout = millis() + 15000;
   int n;
   char hostString[20];
-  sprintf(hostString, "ESP_%06X", ESP.getChipId());
+  uint64_t chipid = ESP.getEfuseMac(); //The chip ID is essentially its MAC address
+  sprintf(hostString, "ESP32_%04X%08X", (uint16_t)(chipid>>32), (uint32_t)chipid);
 
   if (strcmp(this->m_name, name) != 0) {
     int i = 0;
@@ -29,7 +30,9 @@ boolean GoogleHomeNotifier::device(const char * name, const char * locale)
       delay(1);
       if (strcmp(name, "") != 0) {
         for(i = 0; i < n; i++) {
-          if (strcmp(name, MDNS.txt(i, "fn").c_str()) == 0) {
+          String mdns_hostname = MDNS.hostname(i);
+          mdns_hostname.replace("-", "");
+          if (mdns_hostname.compareTo(name) == 0) {
             break;
           }
         }
@@ -225,7 +228,7 @@ boolean GoogleHomeNotifier::connect()
       break;
     }
   }
-  sprintf(this->m_clientid, "client-%d", millis());
+  sprintf(this->m_clientid, "client-%ld", millis());
   return true;
 }
 

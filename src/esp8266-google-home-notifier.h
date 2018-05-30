@@ -7,7 +7,7 @@
 #include <cast_channel.pb.h>
 
 #include <WiFiClientSecure.h>
-#include <ESP8266mDNS.h>
+#include <ESPmDNS.h>
 
 #include <google-tts.h>
 
